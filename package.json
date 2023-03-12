@@ -1,22 +1,22 @@
 {
-  "dependencies": {
-    "concurrently": "^7.6.0"
-  },
-  "name": "tiktok",
-  "version": "1.0.0",
-  "main": "index.js",
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently \"npm start --prefix client\" \"npm start --prefix server\""
-  },
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "prettier": {
-    "trailingComma": "es5",
-    "tabWidth": 4,
-    "semi": false,
-    "singleQuote": true
-  }
+    "dependencies": {
+        "concurrently": "^7.6.0"
+    },
+    "name": "tiktok",
+    "version": "1.0.0",
+    "main": "index.js",
+    "devDependencies": {},
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "concurrently \"npm start --prefix client\" \"npm start --prefix server\" \"npm start --prefix socket\""
+    },
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "prettier": {
+        "trailingComma": "es5",
+        "tabWidth": 4,
+        "semi": false,
+        "singleQuote": true
+    }
 }
