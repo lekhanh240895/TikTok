@@ -34,7 +34,7 @@ function App() {
 
     useEffect(() => {
         const url = process.env.REACT_APP_SOCKET_URL
-        const socket = io(url)
+        const socket = io('https://tiktok-socket.onrender.com')
         dispatch(appSlice.actions.setSocket(socket))
     }, [dispatch])
 

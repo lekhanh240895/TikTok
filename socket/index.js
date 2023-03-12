@@ -1,7 +1,6 @@
 const app = require('express')()
 const { createServer } = require('http')
 const { Server } = require('socket.io')
-const cors = require('cors')
 const server = createServer(app)
 const io = new Server(server, {
     cors: {
@@ -13,7 +12,31 @@ const io = new Server(server, {
     },
 })
 
-app.use(cors())
+app.use(function (req, res, next) {
+    const allowedOrigins = [
+        'http://localhost:3000',
+        'http://localhost:3004',
+        'http://localhost:8900',
+        'https://tiktok-lekhanh.web.app',
+        'https://tiktok-socket.onrender.com',
+        'https://tiktok-server.vercel.app',
+    ]
+
+    const origin = req.headers.origin
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin)
+    }
+    res.header(
+        'Access-Control-Allow-Headers',
+        'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    )
+    res.header('Access-Control-Allow-credentials', true)
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, UPDATE')
+    next()
+})
+app.get('/', function (req, res, next) {
+    res.json('SocketIO Server!')
+})
 
 require('dotenv').config()
 

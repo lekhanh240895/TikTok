@@ -1,6 +1,5 @@
 const express = require('express')
 const path = require('path')
-const cookieParser = require('cookie-parser')
 const helmet = require('helmet') // v1.0.5
 const cors = require('cors')
 
@@ -36,7 +35,30 @@ app.use(
     })
 )
 app.use(helmet())
-app.use(cors())
+// app.use(cors())
+
+app.use(function (req, res, next) {
+    const allowedOrigins = [
+        'http://localhost:3000',
+        'http://localhost:3004',
+        'http://localhost:8900',
+        'https://tiktok-lekhanh.web.app',
+        'https://tiktok-socket.onrender.com',
+        'https://tiktok-server.vercel.app',
+    ]
+
+    const origin = req.headers.origin
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin)
+    }
+    res.header(
+        'Access-Control-Allow-Headers',
+        'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    )
+    res.header('Access-Control-Allow-credentials', true)
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, UPDATE')
+    next()
+})
 
 app.use('/api/users', users)
 app.use('/api/videos', videos)
@@ -46,19 +68,6 @@ app.use('/api/comments', comments)
 app.use('/api/messages', messages)
 app.use('/api/conversations', conversations)
 app.use('/api/notifications', notifications)
-
-// Cookies
-app.use(cookieParser())
-app.get('/get-cookies', (req, res) => {
-    // req.cookies
-    res.json(req.cookies.username)
-})
-app.get('/set-cookies', (req, res) => {
-    res.cookie('username', 'lekhanh')
-    res.cookie('newUser', true)
-
-    res.send('You create cookies')
-})
 
 app.listen(process.env.API_PORT, () => {
     console.log(`API listening on port ${process.env.API_PORT}`)
