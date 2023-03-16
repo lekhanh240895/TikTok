@@ -1,175 +1,184 @@
-import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import Avatar from "~/components/Avatar";
-import Button from "~/components/Button";
+import { useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
+import Avatar from '~/components/Avatar'
+import Button from '~/components/Button'
 import {
-  CheckedIcon,
-  EmojiIcon,
-  LeftArrowIcon2,
-  SolidMessageIcon,
-} from "~/components/Icons";
-import Message from "~/components/Message";
-import { appSelector, authSelector } from "~/redux/selectors";
-import appSlice from "~/redux/slices/appSlice";
-import * as messageService from "~/services/messageService";
-import { Wrapper } from "./styled";
+    CheckedIcon,
+    EmojiIcon,
+    LeftArrowIcon2,
+    SolidMessageIcon,
+} from '~/components/Icons'
+import Message from '~/components/Message'
+import { appSelector, authSelector } from '~/redux/selectors'
+import appSlice from '~/redux/slices/appSlice'
+import * as messageService from '~/services/messageService'
+import { Wrapper } from './styled'
 
 export default function Chatbox({ selectedConversation }) {
-  const messageRef = useRef();
-  const messageList = useRef();
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState(null);
-  const { currentUser } = useSelector(authSelector);
-  const { socket } = useSelector(appSelector);
-  const dispatch = useDispatch();
+    const messageRef = useRef()
+    const messageList = useRef()
+    const [message, setMessage] = useState('')
+    const [conversationMessages, setConversationMessages] = useState([])
+    const [newMessage, setNewMessage] = useState(null)
+    const { currentUser } = useSelector(authSelector)
+    const { socket } = useSelector(appSelector)
+    const dispatch = useDispatch()
 
-  // Get conversation's messages
-  useEffect(() => {
-    (async () => {
-      if (selectedConversation) {
-        const messages = await messageService.get(selectedConversation._id);
-        setMessages(messages);
-      }
-    })();
-  }, [selectedConversation]);
+    // Get conversation's conversationMessages
+    useEffect(() => {
+        ;(async () => {
+            if (selectedConversation) {
+                const conversationMessages = await messageService.get(
+                    selectedConversation._id
+                )
+                setConversationMessages(conversationMessages)
+            }
+        })()
+    }, [selectedConversation])
 
-  useEffect(() => {
-    socket?.on("getMessage", (data) => {
-      setNewMessage(data);
-    });
-  }, [socket]);
+    useEffect(() => {
+        socket?.on('getMessage', (data) => {
+            setNewMessage(data)
+        })
+    }, [socket])
 
-  useEffect(() => {
-    if (
-      newMessage &&
-      selectedConversation?.members.some(
-        (member) => member._id === newMessage?.sender._id
-      )
-    )
-      setMessages((prev) => [...prev, newMessage]);
-  }, [newMessage, selectedConversation]);
+    useEffect(() => {
+        if (
+            newMessage &&
+            selectedConversation?.members.some(
+                (member) => member._id === newMessage?.sender._id
+            )
+        )
+            setConversationMessages((prev) => [...prev, newMessage])
+    }, [newMessage, selectedConversation])
 
-  useEffect(() => {
-    messageList.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
-    });
-  }, [messages]);
+    useEffect(() => {
+        messageList.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'end',
+        })
+    }, [conversationMessages])
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+
+        const receiver = selectedConversation?.members.find(
+            (member) => member._id !== currentUser._id
+        )
+        const res = await messageService.create({
+            receiver: receiver._id,
+            text: message,
+            conversation: selectedConversation._id,
+        })
+        const newMessage = { ...res, sender: currentUser }
+
+        socket?.emit('sendMessage', {
+            ...newMessage,
+            receiver: receiver._id,
+        })
+
+        setConversationMessages((prev) => [...prev, newMessage])
+        setMessage('')
+    }
+
+    const handleDelete = async (id) => {
+        await messageService.remove(id)
+        const newMessages = conversationMessages.filter(
+            (message) => message._id !== id
+        )
+        setConversationMessages(newMessages)
+    }
 
     const receiver = selectedConversation?.members.find(
-      (member) => member._id !== currentUser._id
-    );
-    const res = await messageService.create({
-      receiver: receiver._id,
-      text: message,
-      conversation: selectedConversation._id,
-    });
-    const newMessage = { ...res, sender: currentUser };
+        (member) => member._id !== currentUser?._id
+    )
 
-    socket?.emit("sendMessage", {
-      ...newMessage,
-      receiver: receiver._id,
-    });
+    if (!selectedConversation || !currentUser) return
 
-    setMessages((prev) => [...prev, newMessage]);
-    setMessage("");
-  };
+    return (
+        <Wrapper>
+            <div className="chatbox-header">
+                <Avatar
+                    src={receiver?.avatar}
+                    width="5.6rem"
+                    height="5.6rem"
+                    alt="Avatar"
+                    to={`/@${receiver?.username}`}
+                    className="avatar"
+                />
+                <Link to={`/@${receiver?.username}`}>
+                    <div className="chat-user-info">
+                        <h4 className="chat-user__name">
+                            {receiver?.full_name}
+                            {receiver?.tick && (
+                                <span className="check icon-wrapper">
+                                    <CheckedIcon
+                                        width="1.4rem"
+                                        height="1.4rem"
+                                    />
+                                </span>
+                            )}
+                        </h4>
+                        <p className="chat-user__username">{`@${receiver?.username}`}</p>
+                        <p className="chat-user_subinfo">
+                            <span className="following-count">
+                                {currentUser.followings?.length} đang follow
+                            </span>
+                            <span className="separate"></span>
+                            <span className="follower-count">
+                                {currentUser.followers?.length} follower
+                            </span>
+                        </p>
+                    </div>
+                </Link>
+            </div>
 
-  const handleDelete = async (id) => {
-    await messageService.remove(id);
-    const newMessages = messages.filter((message) => message._id !== id);
-    setMessages(newMessages);
-  };
-
-  const receiver = selectedConversation?.members.find(
-    (member) => member._id !== currentUser?._id
-  );
-
-  if (!selectedConversation || !currentUser) return;
-
-  return (
-    <Wrapper>
-      <div className="chatbox-header">
-        <Avatar
-          src={receiver?.avatar}
-          width="5.6rem"
-          height="5.6rem"
-          alt="Avatar"
-          to={`/@${receiver?.username}`}
-          className="avatar"
-        />
-        <Link to={`/@${receiver?.username}`}>
-          <div className="chat-user-info">
-            <h4 className="chat-user__name">
-              {receiver?.full_name}
-              {receiver?.tick && (
-                <span className="check icon-wrapper">
-                  <CheckedIcon width="1.4rem" height="1.4rem" />
-                </span>
-              )}
-            </h4>
-            <p className="chat-user__username">{`@${receiver?.username}`}</p>
-            <p className="chat-user_subinfo">
-              <span className="following-count">
-                {currentUser.followings?.length} đang follow
-              </span>
-              <span className="separate"></span>
-              <span className="follower-count">
-                {currentUser.followers?.length} follower
-              </span>
-            </p>
-          </div>
-        </Link>
-      </div>
-
-      <div className="messages-wrapper">
-        <ul className="message-list" ref={messageList}>
-          {messages.map((message) => {
-            return (
-              <Message
-                key={message._id}
-                message={message}
-                onDelete={handleDelete}
-                currentUser={currentUser}
-              />
-            );
-          })}
-        </ul>
-      </div>
-      <div className="chatbox-bottom">
-        <form className="add-message-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <input
-              ref={messageRef}
-              type="text"
-              placeholder="Send a message..."
-              className="form-control"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-            <span className="emoji-button icon-wrapper">
-              <EmojiIcon width="2.4rem" height="2.4rem" />
-            </span>
-          </div>
-          {message && (
-            <Button type="submit" className="post-message-btn">
-              <SolidMessageIcon width="3.2rem" height="3.2rem" />
-            </Button>
-          )}
-        </form>
-      </div>
-      <div className="chatbox-back-icon icon-wrapper">
-        <LeftArrowIcon2
-          onClick={() => {
-            dispatch(appSlice.actions.setSelectedConversationID(null));
-          }}
-        />
-      </div>
-    </Wrapper>
-  );
+            <div className="message-list-wrapper">
+                <ul className="message-list" ref={messageList}>
+                    {conversationMessages.map((message) => {
+                        return (
+                            <Message
+                                key={message._id}
+                                message={message}
+                                onDelete={handleDelete}
+                                currentUser={currentUser}
+                            />
+                        )
+                    })}
+                </ul>
+            </div>
+            <div className="chatbox-bottom">
+                <form className="add-message-form" onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <input
+                            ref={messageRef}
+                            type="text"
+                            placeholder="Send a message..."
+                            className="form-control"
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                        />
+                        <span className="emoji-button icon-wrapper">
+                            <EmojiIcon width="2.4rem" height="2.4rem" />
+                        </span>
+                    </div>
+                    {message && (
+                        <Button type="submit" className="post-message-btn">
+                            <SolidMessageIcon width="3.2rem" height="3.2rem" />
+                        </Button>
+                    )}
+                </form>
+            </div>
+            <div className="chatbox-back-icon icon-wrapper">
+                <LeftArrowIcon2
+                    onClick={() => {
+                        dispatch(
+                            appSlice.actions.setSelectedConversationID(null)
+                        )
+                    }}
+                />
+            </div>
+        </Wrapper>
+    )
 }

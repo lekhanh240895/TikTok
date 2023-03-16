@@ -1,6 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit'
 
-const settings = JSON.parse(localStorage.getItem('userSettings'));
+const settings = JSON.parse(localStorage.getItem('userSettings'))
 
 const appSlice = createSlice({
     name: 'app',
@@ -22,39 +22,40 @@ const appSlice = createSlice({
     },
     reducers: {
         setConversations: (state, action) => {
-            state.conversations = action.payload;
+            state.conversations = action.payload
         },
+
         setIsDeleteModalShow: (state, action) => {
-            state.isDeleteModalShow = action.payload;
+            state.isDeleteModalShow = action.payload
         },
         setSocket: (state, action) => {
-            state.socket = action.payload;
+            state.socket = action.payload
         },
         setOnlineUsers: (state, action) => {
-            state.onlineUsers = action.payload;
+            state.onlineUsers = action.payload
         },
         setSelectedVideoID: (state, action) => {
-            state.selectedVideoID = action.payload;
+            state.selectedVideoID = action.payload
         },
         setSelectedConversationID: (state, action) => {
-            state.selectedConversationID = action.payload;
+            state.selectedConversationID = action.payload
         },
         setSelectedUserID: (state, action) => {
-            state.selectedUserID = action.payload;
+            state.selectedUserID = action.payload
         },
         setMousePosition: (state, action) => {
-            state.mousePosition = action.payload;
+            state.mousePosition = action.payload
         },
         setTags: (state, action) => {
-            state.tags = action.payload;
+            state.tags = action.payload
         },
         setMusics: (state, action) => {
-            state.musics = action.payload;
+            state.musics = action.payload
         },
         setSettings: (state, action) => {
-            state.settings = action.payload;
+            state.settings = action.payload
         },
     },
-});
+})
 
-export default appSlice;
+export default appSlice

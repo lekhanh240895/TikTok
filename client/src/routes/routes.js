@@ -1,18 +1,18 @@
-import Following from '~/pages/Folllowing/Following';
-import Home from '~/pages/Home';
-import Profile from '~/pages/Profile';
-import Upload from '~/pages/Upload';
-import Search from '~/pages/Search';
-import config from '~/config';
-import Live from '~/pages/Live';
-import Feedback from '~/pages/Feedback';
-import Music from '~/pages/Music';
-import Tag from '~/pages/Tag';
-import NotFound from '~/pages/NotFound';
-import Messages from '~/pages/Messages';
-import SharedLayout from '~/layouts/SharedLayout';
-import HeaderFooterLayout from '~/layouts/HeaderFooterLayout';
-import VideoModal from '~/components/modals/VideoModal';
+import Following from '~/pages/Folllowing/Following'
+import Home from '~/pages/Home'
+import Profile from '~/pages/Profile'
+import Upload from '~/pages/Upload'
+import Search from '~/pages/Search'
+import config from '~/config'
+import Live from '~/pages/Live'
+import Feedback from '~/pages/Feedback'
+import Music from '~/pages/Music'
+import Tag from '~/pages/Tag'
+import NotFound from '~/pages/NotFound'
+import Messages from '~/pages/Messages'
+import SharedLayout from '~/layouts/SharedLayout'
+import HeaderFooterLayout from '~/layouts/HeaderFooterLayout'
+import VideoModal from '~/components/modals/VideoModal'
 
 const publicRoutes = [
     {
@@ -57,7 +57,7 @@ const publicRoutes = [
         component: VideoModal,
         layout: null,
     },
-];
+]
 
 const privateRoutes = [
     {
@@ -74,6 +74,6 @@ const privateRoutes = [
         path: config.routes.following,
         component: Following,
     },
-];
+]
 
-export { publicRoutes, privateRoutes };
+export { publicRoutes, privateRoutes }

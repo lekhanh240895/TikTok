@@ -1,18 +1,13 @@
-import { useLocation, useNavigate } from 'react-router-dom';
-import { TimesIcon, FlagIcon, TiktokIcon } from '~/components/Icons';
-import { Wrapper } from './styled';
+import { useNavigate } from 'react-router-dom'
+import { TimesIcon, FlagIcon, TiktokIcon } from '~/components/Icons'
+import { Wrapper } from './styled'
 
 export default function Header() {
-    const navigate = useNavigate();
-    const location = useLocation();
+    const navigate = useNavigate()
 
     const handleClose = () => {
-        if (location.state && location.state.background) {
-            navigate(location.state.background.pathname);
-        } else {
-            navigate('/');
-        }
-    };
+        navigate(-1)
+    }
     return (
         <Wrapper className="header">
             <div className="left">
@@ -30,5 +25,5 @@ export default function Header() {
                 Report
             </div>
         </Wrapper>
-    );
+    )
 }

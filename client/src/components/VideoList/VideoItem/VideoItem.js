@@ -1,22 +1,22 @@
-import PropTypes from 'prop-types';
-import React, { useEffect, useRef, useState } from 'react';
-import classnames from 'classnames/bind';
-import HeadlessTippy from '@tippyjs/react/headless';
+import PropTypes from 'prop-types'
+import React, { useEffect, useRef, useState } from 'react'
+import classnames from 'classnames/bind'
+import HeadlessTippy from '@tippyjs/react/headless'
 
-import styles from './Video.module.scss';
+import styles from './Video.module.scss'
 import {
     FlagIcon,
     MutedVolumeIcon,
     PauseIcon,
     PlayIcon,
     VolumeIcon,
-} from '~/components/Icons';
-import ActionList from './ActionList';
-import Info from './Info';
-import { useElementOnScreen } from '~/hooks/useElementOnScreen';
-import Video from '../../Video/Video';
+} from '~/components/Icons'
+import ActionList from './ActionList'
+import Info from './Info'
+import { useElementOnScreen } from '~/hooks/useElementOnScreen'
+import Video from '../../Video/Video'
 
-const cx = classnames.bind(styles);
+const cx = classnames.bind(styles)
 export default function VideoItem({
     video,
     isMuted,
@@ -25,75 +25,75 @@ export default function VideoItem({
     onVolumeChange,
     time = false,
 }) {
-    const [progress, setProgress] = useState(0);
-    const [isPlaying, setIsPlaying] = useState(false);
+    const [progress, setProgress] = useState(0)
+    const [isPlaying, setIsPlaying] = useState(false)
     const [containerRef, isVisible] = useElementOnScreen({
         threshold: 0.75,
-    });
+    })
 
-    const videoRef = useRef();
+    const videoRef = useRef()
 
     useEffect(() => {
         if (videoRef.current) {
-            videoRef.current.volume = volume;
+            videoRef.current.volume = volume
         }
-    }, [videoRef, volume]);
+    }, [videoRef, volume])
 
     useEffect(() => {
         if (isVisible) {
-            const promise = videoRef.current.play();
+            const promise = videoRef.current.play()
             promise
                 .then(() => setIsPlaying(true))
-                .catch((err) => console.log(err));
+                .catch((err) => console.log(err))
         } else {
-            videoRef.current.pause();
-            videoRef.current.currentTime = 0;
+            videoRef.current.pause()
+            videoRef.current.currentTime = 0
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [videoRef, isVisible]);
+    }, [videoRef, isVisible])
 
     const handlePlay = () => {
         if (!videoRef.current.paused) {
-            videoRef.current.pause();
-            setIsPlaying(false);
+            videoRef.current.pause()
+            setIsPlaying(false)
         } else {
-            videoRef.current.play();
-            setIsPlaying(true);
+            videoRef.current.play()
+            setIsPlaying(true)
         }
-    };
+    }
 
     const handleTimeUpdate = () => {
-        const { currentTime, duration } = videoRef.current;
+        const { currentTime, duration } = videoRef.current
 
-        const progress = Math.floor((currentTime / duration) * 100);
+        const progress = Math.floor((currentTime / duration) * 100)
 
-        setProgress(progress);
-    };
+        setProgress(progress)
+    }
 
     const handleProgressChange = (e) => {
-        const { duration } = videoRef.current;
-        const newTime = (Number(e.target.value) * duration) / 100;
-        videoRef.current.currentTime = newTime;
-    };
+        const { duration } = videoRef.current
+        const newTime = (Number(e.target.value) * duration) / 100
+        videoRef.current.currentTime = newTime
+    }
 
-    const handleReport = () => {};
+    const handleReport = () => {}
 
     const handleFormatTime = (seconds) => {
-        let m = Math.floor(seconds / 60);
-        let s = Math.floor(seconds % 60);
+        let m = Math.floor(seconds / 60)
+        let s = Math.floor(seconds % 60)
 
         if (m < 10) {
-            m = '0' + m;
+            m = '0' + m
         }
 
         if (s < 10) {
-            s = '0' + s;
+            s = '0' + s
         }
 
-        const time = m + ':' + s;
+        const time = m + ':' + s
 
-        return time;
-    };
+        return time
+    }
 
     return (
         <div className={cx('wrapper')}>
@@ -161,7 +161,7 @@ export default function VideoItem({
                                     <span
                                         className={cx(
                                             'volume-icon',
-                                            'icon-wrapper',
+                                            'icon-wrapper'
                                         )}
                                         onClick={onMutedVolume}
                                     >
@@ -186,7 +186,7 @@ export default function VideoItem({
                                 <div className={cx('video-footer')}>
                                     <div
                                         className={cx(
-                                            'video-progress-bar-wrapper',
+                                            'video-progress-bar-wrapper'
                                         )}
                                     >
                                         <input
@@ -211,11 +211,11 @@ export default function VideoItem({
                                         <div className={cx('timer-progress')}>
                                             {handleFormatTime(
                                                 videoRef.current.currentTime ||
-                                                    0,
+                                                    0
                                             )}
                                             /
                                             {handleFormatTime(
-                                                videoRef.current.duration || 0,
+                                                videoRef.current.duration || 0
                                             )}
                                         </div>
                                     )}
@@ -228,7 +228,7 @@ export default function VideoItem({
                 <ActionList video={video} />
             </div>
         </div>
-    );
+    )
 }
 
 VideoItem.propTypes = {
@@ -237,4 +237,4 @@ VideoItem.propTypes = {
     volume: PropTypes.number.isRequired,
     onMutedVolume: PropTypes.func.isRequired,
     onVolumeChange: PropTypes.func.isRequired,
-};
+}

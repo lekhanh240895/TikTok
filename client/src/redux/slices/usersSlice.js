@@ -41,8 +41,6 @@ const usersSlice = createSlice({
             .addCase(followUser.fulfilled, (state, action) => {
                 const { currentUserID, followedUserID } = action.payload
 
-                console.log({ currentUserID, followedUserID })
-
                 const newUsers = state.users.map((user) => {
                     return user._id === currentUserID
                         ? {

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 export const Wrapper = styled.div`
     &.hide {
@@ -22,7 +22,7 @@ export const Wrapper = styled.div`
     transition: all 0.5s ease;
     overflow: hidden;
 
-    @media (max-width: 468px) {
+    @media (max-width: 1024px) {
         display: flex;
     }
 
@@ -128,4 +128,4 @@ export const Wrapper = styled.div`
             }
         }
     }
-`;
+`

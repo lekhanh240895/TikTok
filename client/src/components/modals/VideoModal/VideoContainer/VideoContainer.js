@@ -1,160 +1,160 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
     DownArrow,
     PlayIcon,
     VolumeIcon,
     MutedVolumeIcon,
-} from '~/components/Icons';
-import { appSelector, authSelector, videosSelector } from '~/redux/selectors';
-import appSlice from '~/redux/slices/appSlice';
-import HeadlessTippy from '@tippyjs/react/headless';
-import { Wrapper } from './styled';
-import Header from '../Header';
+} from '~/components/Icons'
+import { appSelector, authSelector, videosSelector } from '~/redux/selectors'
+import appSlice from '~/redux/slices/appSlice'
+import HeadlessTippy from '@tippyjs/react/headless'
+import { Wrapper } from './styled'
+import Header from './Header'
 
 export default function VideoContainer({ video }) {
-    const dispatch = useDispatch();
-    const { videos } = useSelector(videosSelector);
-    const { currentUser } = useSelector(authSelector);
-    const [progress, setProgress] = useState(0);
-    const [isPlaying, setIsPlaying] = useState(true);
-    const { settings } = useSelector(appSelector);
-    const videoRef = useRef(null);
-    const navigate = useNavigate();
-    const location = useLocation();
+    const dispatch = useDispatch()
+    const { videos } = useSelector(videosSelector)
+    const { currentUser } = useSelector(authSelector)
+    const [progress, setProgress] = useState(0)
+    const [isPlaying, setIsPlaying] = useState(true)
+    const { settings } = useSelector(appSelector)
+    const videoRef = useRef(null)
+    const navigate = useNavigate()
+    const location = useLocation()
 
     useEffect(() => {
         if (video && settings) {
-            videoRef.current.volume = settings.volume;
+            videoRef.current.volume = settings.volume
         }
-    }, [video, settings]);
+    }, [video, settings])
 
     const escFunction = useCallback(
         (event) => {
             if (event.key === 'Escape') {
                 if (location.state && location.state.background) {
-                    navigate(location.state.background.pathname);
+                    navigate(location.state.background.pathname)
                 } else {
-                    navigate('/');
+                    navigate('/')
                 }
             }
         },
-        [navigate, location],
-    );
+        [navigate, location]
+    )
 
     useEffect(() => {
-        document.addEventListener('keydown', escFunction, false);
+        document.addEventListener('keydown', escFunction, false)
 
         return () => {
-            document.removeEventListener('keydown', escFunction, false);
-        };
-    }, [escFunction]);
+            document.removeEventListener('keydown', escFunction, false)
+        }
+    }, [escFunction])
 
     const setConfig = (settings) => {
-        localStorage.setItem('userSettings', JSON.stringify(settings));
-    };
+        localStorage.setItem('userSettings', JSON.stringify(settings))
+    }
 
     const handleTimeUpdate = () => {
-        const { currentTime, duration } = videoRef.current;
-        const progress = Math.floor((currentTime / duration) * 100);
-        setProgress(progress);
-    };
+        const { currentTime, duration } = videoRef.current
+        const progress = Math.floor((currentTime / duration) * 100)
+        setProgress(progress)
+    }
 
     const handleFormatTime = (seconds) => {
-        let m = Math.floor(seconds / 60);
-        let s = Math.floor(seconds % 60);
+        let m = Math.floor(seconds / 60)
+        let s = Math.floor(seconds % 60)
 
         if ((m > 0) & (m < 10)) {
-            m = '0' + m;
+            m = '0' + m
         }
 
         if (s < 10) {
-            s = '0' + s;
+            s = '0' + s
         }
 
-        const time = m + ':' + s;
+        const time = m + ':' + s
 
-        return time;
-    };
+        return time
+    }
 
     const handlePlay = () => {
         if (!videoRef.current.paused) {
-            videoRef.current.pause();
-            setIsPlaying(false);
+            videoRef.current.pause()
+            setIsPlaying(false)
         } else {
-            videoRef.current.play();
-            setIsPlaying(true);
+            videoRef.current.play()
+            setIsPlaying(true)
         }
-    };
+    }
 
     const handleClickProgress = (e) => {
-        const duration = videoRef.current.duration;
-        e.cancelBubble = true; //IE
-        e.stopPropagation();
-        const rect = e.target.getBoundingClientRect();
+        const duration = videoRef.current.duration
+        e.cancelBubble = true //IE
+        e.stopPropagation()
+        const rect = e.target.getBoundingClientRect()
         const newProgress = parseInt(
             ((e.clientX - rect.left) / e.target.clientWidth) * 100,
-            10,
-        ); //X position within the element.
-        setProgress(newProgress);
-        const newCurrentTime = (duration * newProgress) / 100;
-        videoRef.current.currentTime = newCurrentTime;
-    };
+            10
+        ) //X position within the element.
+        setProgress(newProgress)
+        const newCurrentTime = (duration * newProgress) / 100
+        videoRef.current.currentTime = newCurrentTime
+    }
 
     const handleMuteVolume = () => {
         const newSettings = {
             ...settings,
             isMuted: !settings.isMuted,
-        };
-        dispatch(appSlice.actions.setSettings(newSettings));
-        setConfig(newSettings);
-    };
+        }
+        dispatch(appSlice.actions.setSettings(newSettings))
+        setConfig(newSettings)
+    }
 
     const handleVolumeChange = (e) => {
-        const newVolume = Number(e.target.value);
+        const newVolume = Number(e.target.value)
         const newSettings = {
             ...settings,
             volume: newVolume,
             isMuted: newVolume > 0 ? false : true,
-        };
-        dispatch(appSlice.actions.setSettings(newSettings));
-        setConfig(newSettings);
-    };
+        }
+        dispatch(appSlice.actions.setSettings(newSettings))
+        setConfig(newSettings)
+    }
 
     const handlePrevious = () => {
         const previousIndex =
-            videoIndex - 1 < 0 ? fypVideos.length - 1 : videoIndex - 1;
+            videoIndex - 1 < 0 ? fypVideos.length - 1 : videoIndex - 1
 
-        const previousVideo = fypVideos[previousIndex];
-        const background = location.state.background;
+        const previousVideo = fypVideos[previousIndex]
+        const background = location.state.background
         navigate(
             `/@${previousVideo.user.username}/video/${previousVideo._id}`,
             {
                 state: {
                     background,
                 },
-            },
-        );
-    };
+            }
+        )
+    }
 
     const handleNext = () => {
         const nextIndex =
-            videoIndex + 1 > fypVideos.length - 1 ? 0 : videoIndex + 1;
+            videoIndex + 1 > fypVideos.length - 1 ? 0 : videoIndex + 1
 
-        const nextVideo = fypVideos[nextIndex];
-        const background = location.state.background;
+        const nextVideo = fypVideos[nextIndex]
+        const background = location.state.background
         navigate(`/@${nextVideo.user.username}/video/${nextVideo._id}`, {
             state: {
                 background,
             },
-        });
-    };
+        })
+    }
 
     const fypVideos = videos.filter(
-        (video) => video.user._id !== currentUser?._id,
-    );
-    const videoIndex = fypVideos.findIndex((v) => v._id === video?._id);
+        (video) => video.user._id !== currentUser?._id
+    )
+    const videoIndex = fypVideos.findIndex((v) => v._id === video?._id)
 
     return (
         <Wrapper className="video-container">
@@ -211,11 +211,11 @@ export default function VideoContainer({ video }) {
 
                             <div className="timer-container">
                                 {handleFormatTime(
-                                    videoRef.current?.currentTime || 0,
+                                    videoRef.current?.currentTime || 0
                                 )}{' '}
                                 /{' '}
                                 {handleFormatTime(
-                                    videoRef.current?.duration || 0,
+                                    videoRef.current?.duration || 0
                                 )}
                             </div>
                         </div>
@@ -280,5 +280,5 @@ export default function VideoContainer({ video }) {
                 </span>
             </div>
         </Wrapper>
-    );
+    )
 }

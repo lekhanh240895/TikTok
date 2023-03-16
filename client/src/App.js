@@ -1,6 +1,5 @@
 import { Fragment, useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
-
 import { publicRoutes, privateRoutes } from '~/routes/index'
 import DefaultLayout from '~/layouts/DefaultLayout'
 import GetAppButton from './components/BottomContainer/BottomContainer'
@@ -22,6 +21,7 @@ import { getMe } from './redux/slices/authSlice'
 import Spinner from './components/Spinner/Spinner'
 import { io } from 'socket.io-client'
 import DeleteVideoModal from './components/modals/DeleteVideoModal'
+import { getMessages } from './redux/slices/messageSlice'
 
 function App() {
     const { isLoading, videos } = useSelector(videosSelector)
@@ -52,6 +52,9 @@ function App() {
 
         // Fetch videos
         dispatch(getVideos())
+
+        // Fetch messages
+        dispatch(getMessages())
 
         if (token) dispatch(getMe())
 
@@ -146,21 +149,7 @@ function App() {
                         </Route>
                     )
                 })}
-
-                {/* <Route
-                    path={`@:username/video/:videoID`}
-                    element={<VideoModal />}
-                /> */}
             </Routes>
-
-            {/* {background && (
-                <Routes>
-                    <Route
-                        path={`@:username/video/:videoID`}
-                        element={<VideoModal />}
-                    />
-                </Routes>
-            )} */}
 
             {location.pathname !== '/messages' && <GetAppButton />}
             {isEditModalShow && <EditProfileModal />}

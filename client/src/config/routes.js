@@ -11,4 +11,4 @@ export const routes = {
     messages: '/messages',
     video: '@:username/video/:videoID',
     notFound: '*',
-};
+}

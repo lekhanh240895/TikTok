@@ -72,11 +72,12 @@ const videosSlice = createSlice({
                 )
             })
             .addCase(likeVideo.fulfilled, (state, action) => {
-                const updatedVideoIndex = state.videos.findIndex(
-                    (video) => video.id === action.payload._id
-                )
-
-                state.videos[updatedVideoIndex] = action.payload
+                const newVideos = state.videos.map((video) => {
+                    return video._id === action.payload._id
+                        ? { ...video, likes: action.payload.likes }
+                        : video
+                })
+                state.videos = newVideos
             })
     },
 })
