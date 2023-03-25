@@ -6,6 +6,7 @@ import { useDebounce } from '~/hooks/useDebounce'
 import { Wrapper } from './styled'
 import { useSelector } from 'react-redux'
 import { authSelector, usersSelector } from '~/redux/selectors'
+import { setLocalData } from '~/utils/setLocalData'
 
 export default function SearchUser({ input, setInput, setSelectFormShow }) {
     const [recommendUsers, setRecommendUsers] = useState([])
@@ -17,6 +18,8 @@ export default function SearchUser({ input, setInput, setSelectFormShow }) {
 
     const searchInputRef = useRef(null)
     const deferredQuery = useDebounce(searchValue, 500)
+    const recentUserSearch =
+        JSON.parse(localStorage.getItem('recentUsersSearch')) || []
 
     useEffect(() => {
         if (selectedUsers.length > 0) {
@@ -52,7 +55,7 @@ export default function SearchUser({ input, setInput, setSelectFormShow }) {
     }, [deferredQuery, currentUser, users])
 
     useEffect(() => {
-        const selectedUsers = input?.match(/@\w*\b/g)
+        const selectedUsers = input?.match(/@\w+\S*/g)
 
         if (selectedUsers === null) {
             setSelectedUsers([])
@@ -66,6 +69,13 @@ export default function SearchUser({ input, setInput, setSelectFormShow }) {
         setSeachValue('')
         searchInputRef.current.focus()
 
+        if (!recentUserSearch.some((u) => u === `@${username}`)) {
+            setLocalData(
+                'recentUsersSearch',
+                recentUserSearch.concat(`@${username}`)
+            )
+        }
+
         if (input[input.length - 1] === '@') {
             const newInput = input.slice(0, -1)
             setInput(newInput.concat(`@${username} `))
@@ -73,6 +83,10 @@ export default function SearchUser({ input, setInput, setSelectFormShow }) {
             setInput(input.concat(`@${username} `))
         }
     }
+
+    const recentUsersSearch = users.filter((user) =>
+        recentUserSearch?.includes(`@${user.username}`)
+    )
 
     return (
         <Wrapper className="input-container">
@@ -135,13 +149,32 @@ export default function SearchUser({ input, setInput, setSelectFormShow }) {
                     <div className="select-column">
                         <div className="select-title">Recent</div>
                         <ul className="select-list">
-                            <li className="select-item">
-                                <Avatar width="4.8rem" height="4.8rem" src="" />
-                                <div className="user-info">
-                                    <h4 className="name">Lê Khánh</h4>
-                                    <p className="username">@lekhanhhh</p>
-                                </div>
-                            </li>
+                            {recentUsersSearch.map((user) => (
+                                <li
+                                    className="select-item"
+                                    key={user._id}
+                                    onClick={() =>
+                                        handleSelectUser(user.username)
+                                    }
+                                >
+                                    <div className="avatar-wrapper">
+                                        <Avatar
+                                            width="4.8rem"
+                                            height="4.8rem"
+                                            src={user.avatar}
+                                        />
+                                    </div>
+
+                                    <div className="user-info">
+                                        <h4 className="name">
+                                            {user.full_name}
+                                        </h4>
+                                        <h5 className="username">
+                                            {user.username}
+                                        </h5>
+                                    </div>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 </div>

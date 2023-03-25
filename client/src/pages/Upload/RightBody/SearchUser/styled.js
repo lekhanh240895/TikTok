@@ -99,6 +99,7 @@ export const Wrapper = styled.div`
                             cubic-bezier(0.27, 1.27, 0.48, 0.56) 0s;
                     }
                     display: flex;
+
                     .avatar-wrapper {
                         width: 48px;
                         height: 48px;

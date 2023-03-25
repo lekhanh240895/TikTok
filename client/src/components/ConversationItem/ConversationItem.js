@@ -13,6 +13,7 @@ import {
     PinTopIcon,
 } from '../Icons'
 import Menu from '../Popper/Menu'
+import { setLocalData } from '~/utils/setLocalData'
 
 export default function ConversationItem({
     user,
@@ -34,10 +35,6 @@ export default function ConversationItem({
     const { socket } = useSelector(appSelector)
     const [isRead, setIsRead] = useState(false)
     const { messages } = useSelector(messagesSelector)
-
-    const setLocalData = (name, data) => {
-        localStorage.setItem(name, JSON.stringify(data))
-    }
 
     useEffect(() => {
         if (messages.length > 0) {

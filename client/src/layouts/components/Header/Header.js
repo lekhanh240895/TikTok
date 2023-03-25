@@ -36,6 +36,7 @@ import { appSelector } from '~/redux/selectors'
 import * as notificationService from '~/services/notificationService'
 import { isEqual } from 'lodash'
 import messageSlice from '~/redux/slices/messageSlice'
+import { setLocalData } from '~/utils/setLocalData'
 
 const cx = classnames.bind(styles)
 
@@ -103,10 +104,6 @@ export default function Header({ innerWidth }) {
     )
 
     const { socket, selectedConversationID } = useSelector(appSelector)
-
-    const setLocalData = (name, data) => {
-        localStorage.setItem(name, JSON.stringify(data))
-    }
 
     useEffect(() => {
         socket?.on('getMessage', (data) => {
