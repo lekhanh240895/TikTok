@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import Avatar from '../Avatar'
 import { Wrapper } from './styled'
-import * as messageService from '~/services/messageService'
 import { formatRelative } from 'date-fns'
 import { useSelector } from 'react-redux'
-import { appSelector } from '~/redux/selectors'
+import { appSelector, messagesSelector } from '~/redux/selectors'
 import {
     BlockIcon,
     DeleteIcon,
@@ -22,10 +21,44 @@ export default function ConversationItem({
     isOnline,
     onSelectedConversation,
     onDeleteConversation,
-    unreadMessages,
+    selectedConversationID,
 }) {
     const [unreadConversationMessages, setUnreadConversationMessages] =
         useState([])
+
+    const [unreadMessages, setUnreadMessages] = useState(
+        JSON.parse(localStorage.getItem('unreadMessages')) || []
+    )
+
+    const [conversationMessages, setConversationMessages] = useState([])
+    const { socket } = useSelector(appSelector)
+    const [isRead, setIsRead] = useState(false)
+    const { messages } = useSelector(messagesSelector)
+
+    const setLocalData = (name, data) => {
+        localStorage.setItem(name, JSON.stringify(data))
+    }
+
+    useEffect(() => {
+        if (messages.length > 0) {
+            setConversationMessages(
+                messages.filter((m) => m.conversation === conversation?._id)
+            )
+        }
+    }, [messages, conversation?._id])
+
+    useEffect(() => {
+        socket?.on('getMessage', (data) => {
+            if (selectedConversationID === data.conversation) {
+                setUnreadMessages([])
+                setLocalData('unreadMessages', [])
+            } else {
+                const newMessages = unreadMessages.concat(data)
+                setUnreadMessages(newMessages)
+                setLocalData('unreadMessages', newMessages)
+            }
+        })
+    }, [socket, unreadMessages, selectedConversationID])
 
     useEffect(() => {
         if (unreadMessages.length > 0) {
@@ -37,21 +70,6 @@ export default function ConversationItem({
         }
     }, [unreadMessages, conversation._id])
 
-    const [conversationMessages, setConversationMessages] = useState([])
-    const { socket } = useSelector(appSelector)
-    const [isRead, setIsRead] = useState(false)
-    const [lastMessage, setLastMessage] = useState('')
-
-    // Get conversationMessages
-    useEffect(() => {
-        ;(async () => {
-            const conversationMessages = await messageService.get(
-                conversation._id
-            )
-            setConversationMessages(conversationMessages)
-        })()
-    }, [conversation._id])
-
     useEffect(() => {
         if (unreadConversationMessages.length > 0) {
             setIsRead(false)
@@ -59,6 +77,8 @@ export default function ConversationItem({
             setIsRead(true)
         }
     }, [unreadConversationMessages])
+
+    const lastMessage = conversationMessages[conversationMessages.length - 1]
 
     const handleSelectConversation = () => {
         onSelectedConversation()
@@ -74,26 +94,6 @@ export default function ConversationItem({
             localStorage.setItem('unreadMessages', JSON.stringify(newUnreads))
         }
     }
-
-    useEffect(() => {
-        if (conversationMessages.length > 0) {
-            setLastMessage(
-                conversationMessages[conversationMessages.length - 1]
-            )
-        }
-    }, [conversationMessages])
-
-    useEffect(() => {
-        socket?.on('getMessage', (data) => {
-            if (
-                data &&
-                conversation?.members.some(
-                    (member) => member._id === data?.sender._id
-                )
-            )
-                setConversationMessages((prev) => [...prev, data])
-        })
-    }, [socket, conversation.members])
 
     const formatDate = (timestamp) => {
         const date = formatRelative(new Date(timestamp), new Date())

@@ -10,7 +10,10 @@ const messageSlice = createSlice({
         messages: [],
     },
     reducers: {
-        addVideo: (state, action) => {
+        setMessages: (state, action) => {
+            state.messages = action.payload
+        },
+        createMessage: (state, action) => {
             state.messages.push(action.payload)
         },
         reset: (state) => {
@@ -44,6 +47,7 @@ const messageSlice = createSlice({
                 state.isError = true
                 state.messages = null
             })
+
             .addCase(createMessage.pending, (state, action) => {
                 state.isLoading = true
                 state.isSuccess = false
@@ -92,9 +96,15 @@ export const getMessages = createAsyncThunk(
 
 export const createMessage = createAsyncThunk(
     'messageList/createMessage',
-    async (videoData) => {
+    async (videoData, { getState }) => {
         const newMessage = await messageService.create(videoData)
-        return newMessage
+        const { users } = getState().users
+
+        const message = {
+            ...newMessage,
+            sender: users.find((user) => user._id === newMessage.sender),
+        }
+        return message
     }
 )
 
@@ -117,8 +127,8 @@ export const updateMessage = createAsyncThunk(
 export const deleteMessage = createAsyncThunk(
     'messageList/deleteMessage',
     async (messageId) => {
-        const deletedVideoID = await messageService.remove(messageId)
-        return deletedVideoID
+        const deletedMessageId = await messageService.remove(messageId)
+        return deletedMessageId
     },
     {}
 )

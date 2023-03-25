@@ -1,5 +1,5 @@
-const MessageModel = require('../models/MessageModel');
-const ConversationModel = require('../models/ConversationModel');
+const MessageModel = require('../models/MessageModel')
+const ConversationModel = require('../models/ConversationModel')
 
 class MessageController {
     // [GET] api/messages
@@ -8,12 +8,12 @@ class MessageController {
             const messages = await MessageModel.find()
                 .populate('sender')
                 .populate('likes')
-                .exec();
+                .exec()
 
-            res.status(200).json(messages);
+            res.status(200).json(messages)
         } catch (err) {
-            res.status(500).json({ error: err });
-            next();
+            res.status(500).json({ error: err })
+            next()
         }
     }
 
@@ -26,11 +26,11 @@ class MessageController {
             })
                 .populate('sender')
                 .populate('likes')
-                .exec();
-            res.status(200).json(message);
+                .exec()
+            res.status(200).json(message)
         } catch (err) {
-            res.status(500).json({ error: err });
-            next();
+            res.status(500).json({ error: err })
+            next()
         }
     }
 
@@ -40,12 +40,12 @@ class MessageController {
             const newMessage = new MessageModel({
                 ...req.body,
                 sender: req.user._id,
-            });
-            await newMessage.save();
-            res.status(200).json(newMessage);
+            })
+            await newMessage.save()
+            res.status(200).json(newMessage)
         } catch (err) {
-            res.status(500).json({ error: err });
-            next();
+            res.status(500).json({ error: err })
+            next()
         }
     }
 
@@ -55,33 +55,33 @@ class MessageController {
             const message = await MessageModel.findByIdAndUpdate(
                 req.params.id,
                 req.body,
-                { new: true },
-            );
-            res.status(200).json(message);
+                { new: true }
+            )
+            res.status(200).json(message)
         } catch (err) {
-            res.status(500).json({ error: err });
-            next();
+            res.status(500).json({ error: err })
+            next()
         }
     }
 
     // [PUT] api/messages/:id/like
     async likeMessage(req, res, next) {
         try {
-            const message = await MessageModel.findById(req.params.id);
+            const message = await MessageModel.findById(req.params.id)
             if (!message.likes.includes(req.user.id)) {
                 await message.updateOne({
                     $push: { likes: req.user.id },
-                });
-                res.status(200).json('Message liked!');
+                })
+                res.status(200).json('Message liked!')
             } else {
                 await message.updateOne({
                     $pull: { likes: req.user.id },
-                });
-                res.status(200).json('Message unliked!');
+                })
+                res.status(200).json('Message unliked!')
             }
         } catch (err) {
-            res.status(500).json({ error: err });
-            next();
+            res.status(500).json({ error: err })
+            next()
         }
     }
 
@@ -89,14 +89,14 @@ class MessageController {
     async deleteMessage(req, res, next) {
         try {
             const deletedMessage = await MessageModel.findByIdAndDelete(
-                req.params.id,
-            );
-            res.status(200).json(deletedMessage);
+                req.params.id
+            )
+            res.status(200).json(deletedMessage._id)
         } catch (err) {
-            res.status(500).json({ error: err });
-            next();
+            res.status(500).json({ error: err })
+            next()
         }
     }
 }
 
-module.exports = new MessageController();
+module.exports = new MessageController()

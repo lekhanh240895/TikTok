@@ -29,17 +29,20 @@ import Search from '../Search'
 import config from '~/config'
 import { useDispatch, useSelector } from 'react-redux'
 import loginModalSlice from '~/redux/slices/loginModalSlice'
-import { authSelector } from '~/redux/selectors'
+import { authSelector, messagesSelector } from '~/redux/selectors'
 import Avatar from '~/components/Avatar'
 import Notifications from '~/components/Notifications'
 import { appSelector } from '~/redux/selectors'
 import * as notificationService from '~/services/notificationService'
 import { isEqual } from 'lodash'
+import messageSlice from '~/redux/slices/messageSlice'
 
 const cx = classnames.bind(styles)
 
 export default function Header({ innerWidth }) {
     const { currentUser } = useSelector(authSelector)
+    const { messages } = useSelector(messagesSelector)
+
     const MENU_ITEMS = [
         {
             icon: <LanguageIcon width="2rem" height="2rem" />,
@@ -115,8 +118,11 @@ export default function Header({ innerWidth }) {
                 setUnreadMessages(newMessages)
                 setLocalData('unreadMessages', newMessages)
             }
+
+            const newMessages = messages.concat(data)
+            dispatch(messageSlice.actions.setMessages(newMessages))
         })
-    }, [socket, unreadMessages, selectedConversationID])
+    }, [socket, unreadMessages, selectedConversationID, messages, dispatch])
 
     useEffect(() => {
         ;(async () => {

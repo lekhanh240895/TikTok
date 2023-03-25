@@ -1,27 +1,28 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import Modal from '~/components/modals/Modal';
-import { appSelector, videosSelector } from '~/redux/selectors';
-import appSlice from '~/redux/slices/appSlice';
-import { deleteVideo } from '~/redux/slices/videosSlice';
-import { handleDeleteFilesFirebase } from '~/services/firebaseService';
-import { Wrapper } from './styled';
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import Modal from '~/components/modals/Modal'
+import { appSelector, videosSelector } from '~/redux/selectors'
+import appSlice from '~/redux/slices/appSlice'
+import { deleteVideo } from '~/redux/slices/videosSlice'
+import { handleDeleteFilesFirebase } from '~/services/firebaseService'
+import { Wrapper } from './styled'
 
 export default function DeleteVideoModal() {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const { selectedVideoID } = useSelector(appSelector);
-    const { videos } = useSelector(videosSelector);
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const { selectedVideoID } = useSelector(appSelector)
+    const { videos } = useSelector(videosSelector)
+
     const handleDelete = () => {
-        const video = videos.find((video) => video._id === selectedVideoID);
-        handleDeleteFilesFirebase([video.cover, video.src]);
-        dispatch(deleteVideo(selectedVideoID));
-        navigate(-1);
-        dispatch(appSlice.actions.setIsDeleteModalShow(false));
-    };
+        const video = videos.find((video) => video._id === selectedVideoID)
+        handleDeleteFilesFirebase([video.cover, video.src])
+        dispatch(deleteVideo(selectedVideoID))
+        navigate(-1)
+        dispatch(appSlice.actions.setIsDeleteModalShow(false))
+    }
     const handleCancel = () => {
-        dispatch(appSlice.actions.setIsDeleteModalShow(false));
-    };
+        dispatch(appSlice.actions.setIsDeleteModalShow(false))
+    }
     return (
         <Modal>
             <Wrapper>
@@ -38,5 +39,5 @@ export default function DeleteVideoModal() {
                 </div>
             </Wrapper>
         </Modal>
-    );
+    )
 }

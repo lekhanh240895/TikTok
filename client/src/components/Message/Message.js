@@ -1,25 +1,28 @@
-import Tippy from '@tippyjs/react';
-import React, { useState } from 'react';
-import Avatar from '../Avatar';
-import { OptionIcon, SolidHeartIcon } from '../Icons';
-import { Wrapper } from './styled';
-import * as messageSerVice from '~/services/messageService';
+import Tippy from '@tippyjs/react'
+import React, { useState } from 'react'
+import Avatar from '../Avatar'
+import { OptionIcon, SolidHeartIcon } from '../Icons'
+import { Wrapper } from './styled'
+import * as messageSerVice from '~/services/messageService'
 
 export default function Message({ message, onDelete, currentUser }) {
     const [isLiked, setIsLiked] = useState(
-        message.likes.some((user) => user._id === currentUser?._id),
-    );
-    const [likes, setLikes] = useState(message.likes);
+        message.likes.some((user) => user._id === currentUser?._id)
+    )
+
+    const [likes, setLikes] = useState(message.likes)
+
     const handleLike = async () => {
-        await messageSerVice.like(message._id);
-        setIsLiked(!isLiked);
+        await messageSerVice.like(message._id)
+        setIsLiked(!isLiked)
+
         setLikes(
             isLiked
                 ? likes.filter((user) => user._id !== currentUser?._id)
-                : likes.concat(currentUser),
-        );
-    };
-    const isTheirMessage = message.sender._id !== currentUser?._id;
+                : likes.concat(currentUser)
+        )
+    }
+    const isTheirMessage = message.sender._id !== currentUser?._id
 
     return (
         <Wrapper>
@@ -49,9 +52,11 @@ export default function Message({ message, onDelete, currentUser }) {
                     content={
                         <div className="message-option-tippy">
                             <span onClick={handleLike}>Like</span>
-                            <span onClick={() => onDelete(message._id)}>
-                                Delete
-                            </span>
+                            {message.sender._id === currentUser._id && (
+                                <span onClick={() => onDelete(message._id)}>
+                                    Delete
+                                </span>
+                            )}
                         </div>
                     }
                 >
@@ -90,5 +95,5 @@ export default function Message({ message, onDelete, currentUser }) {
                 </div>
             )}
         </Wrapper>
-    );
+    )
 }

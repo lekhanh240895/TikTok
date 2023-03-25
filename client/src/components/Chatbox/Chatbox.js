@@ -12,46 +12,27 @@ import {
 import Message from '~/components/Message'
 import { appSelector, authSelector } from '~/redux/selectors'
 import appSlice from '~/redux/slices/appSlice'
-import * as messageService from '~/services/messageService'
 import { Wrapper } from './styled'
+import { createMessage, deleteMessage } from '~/redux/slices/messageSlice'
 
-export default function Chatbox({ selectedConversation }) {
+export default function Chatbox({ messages, selectedConversation }) {
     const messageRef = useRef()
     const messageList = useRef()
     const [message, setMessage] = useState('')
     const [conversationMessages, setConversationMessages] = useState([])
-    const [newMessage, setNewMessage] = useState(null)
     const { currentUser } = useSelector(authSelector)
     const { socket } = useSelector(appSelector)
     const dispatch = useDispatch()
 
-    // Get conversation's conversationMessages
     useEffect(() => {
-        ;(async () => {
-            if (selectedConversation) {
-                const conversationMessages = await messageService.get(
-                    selectedConversation._id
+        if (messages.length > 0) {
+            setConversationMessages(
+                messages.filter(
+                    (m) => m.conversation === selectedConversation?._id
                 )
-                setConversationMessages(conversationMessages)
-            }
-        })()
-    }, [selectedConversation])
-
-    useEffect(() => {
-        socket?.on('getMessage', (data) => {
-            setNewMessage(data)
-        })
-    }, [socket])
-
-    useEffect(() => {
-        if (
-            newMessage &&
-            selectedConversation?.members.some(
-                (member) => member._id === newMessage?.sender._id
             )
-        )
-            setConversationMessages((prev) => [...prev, newMessage])
-    }, [newMessage, selectedConversation])
+        }
+    }, [messages, selectedConversation?._id])
 
     useEffect(() => {
         messageList.current?.scrollIntoView({
@@ -66,28 +47,25 @@ export default function Chatbox({ selectedConversation }) {
         const receiver = selectedConversation?.members.find(
             (member) => member._id !== currentUser._id
         )
-        const res = await messageService.create({
-            receiver: receiver._id,
-            text: message,
-            conversation: selectedConversation._id,
-        })
-        const newMessage = { ...res, sender: currentUser }
+
+        const newMessage = await dispatch(
+            createMessage({
+                receiver: receiver._id,
+                text: message,
+                conversation: selectedConversation._id,
+            })
+        ).unwrap()
+
+        setMessage('')
 
         socket?.emit('sendMessage', {
             ...newMessage,
             receiver: receiver._id,
         })
-
-        setConversationMessages((prev) => [...prev, newMessage])
-        setMessage('')
     }
 
     const handleDelete = async (id) => {
-        await messageService.remove(id)
-        const newMessages = conversationMessages.filter(
-            (message) => message._id !== id
-        )
-        setConversationMessages(newMessages)
+        dispatch(deleteMessage(id))
     }
 
     const receiver = selectedConversation?.members.find(
@@ -170,14 +148,13 @@ export default function Chatbox({ selectedConversation }) {
                     )}
                 </form>
             </div>
-            <div className="chatbox-back-icon icon-wrapper">
-                <LeftArrowIcon2
-                    onClick={() => {
-                        dispatch(
-                            appSlice.actions.setSelectedConversationID(null)
-                        )
-                    }}
-                />
+            <div
+                className="chatbox-back-icon icon-wrapper"
+                onClick={() => {
+                    dispatch(appSlice.actions.setSelectedConversationID(null))
+                }}
+            >
+                <LeftArrowIcon2 />
             </div>
         </Wrapper>
     )

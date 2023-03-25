@@ -3,24 +3,30 @@ import { useDispatch, useSelector } from 'react-redux'
 import ConversationItem from '~/components/ConversationItem'
 import { LeftArrowIcon2, SettingIcon2 } from '~/components/Icons'
 import Header from '~/layouts/components/Header'
-import { appSelector, authSelector } from '~/redux/selectors'
+import { appSelector, authSelector, messagesSelector } from '~/redux/selectors'
 import { Wrapper } from './styled'
 import * as conversationService from '~/services/conversationService'
 import appSlice from '~/redux/slices/appSlice'
 import Chatbox from '~/components/Chatbox/Chatbox'
 import { useNavigate } from 'react-router-dom'
+import messageSlice from '~/redux/slices/messageSlice'
 
 export default function Messages() {
     const [conversations, setConversations] = useState([])
     const { currentUser } = useSelector(authSelector)
     const { selectedConversationID, onlineUsers, socket } =
         useSelector(appSelector)
-    const [unreadMessages, setUnreadMessages] = useState(
-        JSON.parse(localStorage.getItem('unreadMessages')) || []
-    )
+    const { messages } = useSelector(messagesSelector)
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
+
+    useEffect(() => {
+        socket?.on('getMessage', (data) => {
+            const newMessages = messages.concat(data)
+            dispatch(messageSlice.actions.setMessages(newMessages))
+        })
+    }, [dispatch, socket, messages])
 
     // Get user's conversations
     useEffect(() => {
@@ -65,23 +71,6 @@ export default function Messages() {
         }
     }
 
-    const setLocalData = (name, data) => {
-        localStorage.setItem(name, JSON.stringify(data))
-    }
-
-    useEffect(() => {
-        socket?.on('getMessage', (data) => {
-            if (selectedConversationID === data.conversation) {
-                setUnreadMessages([])
-                setLocalData('unreadMessages', [])
-            } else {
-                const newMessages = unreadMessages.concat(data)
-                setUnreadMessages(newMessages)
-                setLocalData('unreadMessages', newMessages)
-            }
-        })
-    }, [socket, unreadMessages, selectedConversationID])
-
     return (
         <Wrapper>
             <Header />
@@ -113,7 +102,6 @@ export default function Messages() {
 
                                 return (
                                     <ConversationItem
-                                        unreadMessages={unreadMessages}
                                         onDeleteConversation={
                                             handleDeleteConversation
                                         }
@@ -132,6 +120,9 @@ export default function Messages() {
                                             selectedConversationID ===
                                             conversation._id
                                         }
+                                        selectedConversationID={
+                                            selectedConversationID
+                                        }
                                     />
                                 )
                             })}
@@ -140,7 +131,10 @@ export default function Messages() {
 
                 <div className="content">
                     {selectedConversationID && (
-                        <Chatbox selectedConversation={selectedConversation} />
+                        <Chatbox
+                            selectedConversation={selectedConversation}
+                            messages={messages}
+                        />
                     )}
                 </div>
 

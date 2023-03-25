@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 const UserModel = new Schema(
     {
@@ -7,15 +7,18 @@ const UserModel = new Schema(
             type: String,
             required: [true, 'Please add a username!'],
             unique: true,
+            trim: true,
         },
         email: {
             type: String,
             required: [true, 'Please add an email!'],
             unique: true,
+            trim: true,
         },
         password: {
             type: String,
             required: [true, 'Please add a password!'],
+            trim: true,
         },
         followings: [
             {
@@ -46,7 +49,7 @@ const UserModel = new Schema(
         twitter_url: { type: String, default: '' },
         instagram_url: { type: String, default: '' },
     },
-    { timestamps: true },
-);
+    { timestamps: true }
+)
 
-module.exports = mongoose.model('User', UserModel);
+module.exports = mongoose.model('User', UserModel)

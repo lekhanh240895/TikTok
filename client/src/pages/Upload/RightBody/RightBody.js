@@ -1,26 +1,26 @@
-import { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import Button from '~/components/Button';
+import { useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import Button from '~/components/Button'
 import {
     AtIcon,
     InfoIcon,
     SolidDownArrowIcon,
     TagIcon,
-} from '~/components/Icons';
-import Spinner from '~/components/Spinner/Spinner';
-import { appSelector, usersSelector } from '~/redux/selectors';
-import videosSlice from '~/redux/slices/videosSlice';
-import * as videoService from '~/services/videoService';
-import DiscardModal from './DiscardModal';
-import RedirectModal from './RedirectModal';
-import { Wrapper } from './styled';
-import * as notificationService from '~/services/notificationService';
+} from '~/components/Icons'
+import Spinner from '~/components/Spinner/Spinner'
+import { appSelector, usersSelector } from '~/redux/selectors'
+import videosSlice from '~/redux/slices/videosSlice'
+import * as videoService from '~/services/videoService'
+import DiscardModal from './DiscardModal'
+import RedirectModal from './RedirectModal'
+import { Wrapper } from './styled'
+import * as notificationService from '~/services/notificationService'
 import {
     uploadDataUrlFirebase,
     uploadFileFirebase,
-} from '~/services/firebaseService';
-import SearchUser from './SearchUser';
+} from '~/services/firebaseService'
+import SearchUser from './SearchUser'
 
 export default function RightBody({
     thumbnails,
@@ -33,14 +33,14 @@ export default function RightBody({
     video,
     currentUser,
 }) {
-    const [offset, setOffset] = useState(4);
-    const [scroll, setScroll] = useState(0);
-    const [translateX, setTranslateX] = useState(8);
-    const [discardModalShow, setDiscardModalShow] = useState(false);
-    const [isUploaded, setIsUploaded] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [selectFormShow, setSelectFormShow] = useState(false);
-    const [copyrightActive, setCopyrightActive] = useState(false);
+    const [offset, setOffset] = useState(4)
+    const [scroll, setScroll] = useState(0)
+    const [translateX, setTranslateX] = useState(8)
+    const [discardModalShow, setDiscardModalShow] = useState(false)
+    const [isUploaded, setIsUploaded] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+    const [selectFormShow, setSelectFormShow] = useState(false)
+    const [copyrightActive, setCopyrightActive] = useState(false)
     const [formData, setFormData] = useState({
         src: '',
         privacy: 'public',
@@ -51,52 +51,54 @@ export default function RightBody({
             stitch: true,
         },
         music: '',
-    });
+    })
 
-    const { users } = useSelector(usersSelector);
-    const { socket } = useSelector(appSelector);
-    const captionRef = useRef(null);
-    const privacyRef = useRef(null);
+    const { users } = useSelector(usersSelector)
+    const { socket } = useSelector(appSelector)
+    const captionRef = useRef(null)
+    const privacyRef = useRef(null)
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (caption.match(/@\B/g)) {
-            setSelectFormShow(true);
+            setSelectFormShow(true)
+        } else {
+            captionRef.current.focus()
+            setSelectFormShow(false)
         }
-    }, [caption]);
+    }, [caption])
 
     useEffect(() => {
-        const x = offset - scroll;
+        const x = offset - scroll
         if (x < 4) {
-            return setTranslateX(4);
+            return setTranslateX(4)
         }
         if (x > 580) {
-            return setTranslateX(580);
+            return setTranslateX(580)
         }
-        setTranslateX(x);
-    }, [offset, scroll]);
+        setTranslateX(x)
+    }, [offset, scroll])
 
     useEffect(() => {
         setFormData({
             ...formData,
             title: caption,
             music: `Original sound - @${currentUser?.username}`,
-        });
+        })
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [caption, currentUser]);
+    }, [caption, currentUser])
 
     useEffect(() => {
-        setOffset(0);
-        setScroll(0);
-    }, [thumbnails]);
+        setOffset(0)
+        setScroll(0)
+    }, [thumbnails])
 
     const handleInputChange = (e) => {
-        const target = e.target;
-        const value =
-            target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
+        const target = e.target
+        const value = target.type === 'checkbox' ? target.checked : target.value
+        const name = target.name
         if (target.type === 'checkbox') {
             setFormData({
                 ...formData,
@@ -104,30 +106,30 @@ export default function RightBody({
                     ...formData.allowance,
                     [name]: value,
                 },
-            });
+            })
         } else {
             setFormData({
                 ...formData,
                 [name]: value,
-            });
+            })
         }
-    };
+    }
 
     const handleClickTagIcon = () => {
         setFormData({
             ...formData,
             title: (prev) => prev.concat('#'),
-        });
-        setCaption((prev) => prev.concat('#'));
-        captionRef.current.focus();
-    };
+        })
+        setCaption((prev) => prev.concat('#'))
+        captionRef.current.focus()
+    }
 
     const handleRedirect = () => {
-        navigate(`/@${currentUser.username}`);
-    };
+        navigate(`/@${currentUser.username}`)
+    }
 
     const handleDiscard = () => {
-        onDiscard();
+        onDiscard()
         setFormData({
             src: '',
             privacy: 'public',
@@ -138,117 +140,139 @@ export default function RightBody({
                 stitch: true,
             },
             music: '',
-        });
-        const checkedInputs = document.querySelectorAll('.checkbox-input');
+        })
+        const checkedInputs = document.querySelectorAll('.checkbox-input')
         checkedInputs.forEach((checkedInput) => {
-            checkedInput.checked = true;
-        });
-    };
+            checkedInput.checked = true
+        })
+    }
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
+        e.preventDefault()
 
-        // Upload to firebase
-        const videoUrl = await uploadFileFirebase('videos/', video);
-        const imgUrl = await uploadDataUrlFirebase('images/', videoThumb);
+        if (video) {
+            setIsLoading(true)
 
-        // Upload Video
-        const newFormData = {
-            ...formData,
-            src: videoUrl,
-            cover: imgUrl,
-        };
-        const response = await videoService.create(newFormData);
-        const user = users.find((user) => user._id === response.user);
-        const newVideo = {
-            ...response,
-            user,
-        };
-        dispatch(videosSlice.actions.addVideo(newVideo));
-        setIsLoading(false);
-        setIsUploaded(true);
-        onDiscard();
+            // Upload to firebase
+            const videoUrl = await uploadFileFirebase('videos/', video)
+            const imgUrl = await uploadDataUrlFirebase('images/', videoThumb)
 
-        // Send notification to tag user
-        const tagUsernames = newVideo.title.match(/[@]\w*\b/g) || [];
-        if (tagUsernames.length > 0) {
-            const tagUsers = users.filter((user) =>
-                tagUsernames.some(
-                    (username) => username.replace('@', '') === user.username,
-                ),
-            );
-            tagUsers.forEach(async (user) => {
-                const data = {
-                    receiver: user._id,
-                    type: 'mention',
-                    video: newVideo,
-                    sender: currentUser,
-                };
+            // Upload Video
+            const newFormData = {
+                ...formData,
+                src: videoUrl,
+                cover: imgUrl,
+            }
+            const response = await videoService.create(newFormData)
+            const user = users.find((user) => user._id === response.user)
+            const newVideo = {
+                ...response,
+                user,
+            }
+            dispatch(videosSlice.actions.addVideo(newVideo))
+            setIsLoading(false)
+            setIsUploaded(true)
+            onDiscard()
 
-                socket.emit('sendNotification', data);
+            // Send notification to tag user
+            const tagUsernames = newVideo.title.match(/[@]\w*\b/g) || []
+            if (tagUsernames.length > 0) {
+                const tagUsers = users.filter((user) =>
+                    tagUsernames.some(
+                        (username) =>
+                            username.replace('@', '') === user.username
+                    )
+                )
+                tagUsers.forEach(async (user) => {
+                    const data = {
+                        receiver: user._id,
+                        type: 'mention',
+                        video: newVideo,
+                        sender: currentUser,
+                    }
 
-                if (data.receiver !== data.sender._id) {
-                    await notificationService.create({
-                        ...data,
-                        createdAt: new Date(),
-                    });
-                }
-            });
+                    socket.emit('sendNotification', data)
+
+                    if (data.receiver !== data.sender._id) {
+                        await notificationService.create({
+                            ...data,
+                            createdAt: new Date(),
+                        })
+                    }
+                })
+            }
         }
-    };
+    }
 
-    const privacys = ['public', 'friends', 'private'];
+    const privacys = ['public', 'friends', 'private']
 
-    if (isLoading) return <Spinner />;
+    if (isLoading) return <Spinner />
 
     return (
         <Wrapper>
             <form onSubmit={handleSubmit}>
-                {selectFormShow ? (
-                    <SearchUser
-                        currentUser={currentUser}
-                        caption={caption}
-                        setCaption={setCaption}
-                        setSelectFormShow={setSelectFormShow}
-                        users={users}
-                    />
-                ) : (
-                    <div className="form-group">
-                        <div className="title">
-                            <label htmlFor="caption">Caption</label>
-                            <div className="limited">0 / 150</div>
-                        </div>
+                <div className="form-group">
+                    {selectFormShow ? (
+                        <>
+                            <div className="title">
+                                <label htmlFor="search-user" className="label">
+                                    <AtIcon width="1.4rem" height="1.4rem" />
+                                    Friends
+                                </label>
+                            </div>
 
-                        <div className="input-container">
-                            <input
-                                type="text"
-                                maxLength={150}
-                                className="input"
-                                id="caption"
-                                value={caption}
-                                name="title"
-                                onChange={(e) => setCaption(e.target.value)}
-                                ref={captionRef}
+                            <SearchUser
+                                input={caption}
+                                setInput={setCaption}
+                                setSelectFormShow={setSelectFormShow}
                             />
+                        </>
+                    ) : (
+                        <>
+                            <div className="title">
+                                <label htmlFor="caption">Caption</label>
+                                <div className="limited">0 / 150</div>
+                            </div>
 
-                            <span className="hashtag">
-                                <span
-                                    className="hash icon-wrapper"
-                                    onClick={() => setSelectFormShow('true')}
-                                >
-                                    <AtIcon width="1.5rem" height="1.5rem" />
+                            <div className="input-container">
+                                <input
+                                    type="text"
+                                    maxLength={150}
+                                    className="input"
+                                    id="caption"
+                                    value={caption}
+                                    name="title"
+                                    onChange={(e) => setCaption(e.target.value)}
+                                    ref={captionRef}
+                                />
+
+                                <span className="hashtag">
+                                    <span
+                                        className="hash icon-wrapper"
+                                        onClick={() =>
+                                            setSelectFormShow('true')
+                                        }
+                                    >
+                                        <AtIcon
+                                            width="1.5rem"
+                                            height="1.5rem"
+                                        />
+                                    </span>
+                                    <span
+                                        className="tag icon-wrapper"
+                                        onClick={handleClickTagIcon}
+                                    >
+                                        <TagIcon
+                                            width="1.5rem"
+                                            height="1.5rem"
+                                        />
+                                    </span>
                                 </span>
-                                <span
-                                    className="tag icon-wrapper"
-                                    onClick={handleClickTagIcon}
-                                >
-                                    <TagIcon width="1.5rem" height="1.5rem" />
-                                </span>
-                            </span>
-                        </div>
-                    </div>
-                )}
+                            </div>
+                        </>
+                    )}
+                </div>
+
                 <div className="form-group">
                     <div className="title">
                         <span>Cover</span>
@@ -269,8 +293,8 @@ export default function RightBody({
                                     {thumbnails.map((item, index) => (
                                         <img
                                             onClick={(e) => {
-                                                setVideoThumb(item);
-                                                setOffset(e.target.offsetLeft);
+                                                setVideoThumb(item)
+                                                setOffset(e.target.offsetLeft)
                                             }}
                                             src={item}
                                             alt="cover"
@@ -438,11 +462,11 @@ export default function RightBody({
             {isUploaded && (
                 <RedirectModal
                     onCancel={() => {
-                        setIsUploaded(false);
+                        setIsUploaded(false)
                     }}
                     onRedirect={handleRedirect}
                 />
             )}
         </Wrapper>
-    );
+    )
 }

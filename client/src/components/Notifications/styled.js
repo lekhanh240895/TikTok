@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 export const Wrapper = styled.div`
     width: 100%;
@@ -83,13 +83,16 @@ export const Wrapper = styled.div`
                 }
                 .notification-desc {
                     color: rgb(22 24 35 / 50%);
-                    display: -webkit-box;
-                    -webkit-box-orient: vertical;
-                    -webkit-line-clamp: 3;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    word-break: break-word;
                     max-height: 70px;
+
+                    & + span {
+                        overflow: hidden;
+                        display: -webkit-box;
+                        -webkit-box-orient: vertical;
+                        -webkit-line-clamp: 3;
+                        text-overflow: ellipsis;
+                        word-break: break-word;
+                    }
                 }
                 .notification-time {
                     margin: 0 5px;
@@ -100,6 +103,12 @@ export const Wrapper = styled.div`
                     margin-top: 4px;
                     padding-left: 8px;
                     border-left: 1px solid rgb(22 24 35 / 50%);
+                    overflow: hidden;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 2;
+                    text-overflow: ellipsis;
+                    word-break: break-word;
                 }
                 .notification-desc__mention {
                     display: inline-block;
@@ -126,4 +135,4 @@ export const Wrapper = styled.div`
             }
         }
     }
-`;
+`

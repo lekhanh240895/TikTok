@@ -1,110 +1,108 @@
-import { useEffect, useRef, useState } from 'react';
-import Avatar from '~/components/Avatar';
-import { AtIcon, SearchIcon, TimesIcon } from '~/components/Icons';
-import * as userService from '~/services/userService';
-import { useDebounce } from '~/hooks/useDebounce';
-import { Wrapper } from './styled';
+import { useEffect, useRef, useState } from 'react'
+import Avatar from '~/components/Avatar'
+import { SearchIcon, TimesIcon } from '~/components/Icons'
+import * as userService from '~/services/userService'
+import { useDebounce } from '~/hooks/useDebounce'
+import { Wrapper } from './styled'
+import { useSelector } from 'react-redux'
+import { authSelector, usersSelector } from '~/redux/selectors'
 
-export default function SearchUser({
-    currentUser,
-    caption,
-    setCaption,
-    setSelectFormShow,
-    users,
-}) {
-    const [recommendUsers, setRecommendUsers] = useState([]);
-    const [searchUsers, setSearchUsers] = useState([]);
-    const [selectedUsers, setSelectedUsers] = useState([]);
-    const [searchValue, setSeachValue] = useState('');
-    const searchInputRef = useRef(null);
+export default function SearchUser({ input, setInput, setSelectFormShow }) {
+    const [recommendUsers, setRecommendUsers] = useState([])
+    const [searchUsers, setSearchUsers] = useState([])
+    const [selectedUsers, setSelectedUsers] = useState([])
+    const [searchValue, setSeachValue] = useState('')
+    const { users } = useSelector(usersSelector)
+    const { currentUser } = useSelector(authSelector)
 
-    const deferredQuery = useDebounce(searchValue, 500);
+    const searchInputRef = useRef(null)
+    const deferredQuery = useDebounce(searchValue, 500)
 
     useEffect(() => {
         if (selectedUsers.length > 0) {
             const recommendUsers = searchUsers.filter(
-                (user) => !selectedUsers.includes(`@${user.username}`),
-            );
-            setRecommendUsers(recommendUsers);
+                (user) => !selectedUsers.includes(`@${user.username}`)
+            )
+            setRecommendUsers(recommendUsers)
         } else {
-            setRecommendUsers(searchUsers);
+            setRecommendUsers(searchUsers)
         }
-    }, [searchUsers, selectedUsers]);
+    }, [searchUsers, selectedUsers])
 
     useEffect(() => {
         if (searchInputRef.current) {
-            searchInputRef.current.focus();
+            searchInputRef.current.focus()
         }
-    });
+    })
 
     useEffect(() => {
         if (deferredQuery) {
-            (async () => {
-                const searchUsers = await userService.searchUser(deferredQuery);
-                setSearchUsers(searchUsers);
-            })();
+            ;(async () => {
+                const searchUsers = await userService.searchUser(deferredQuery)
+                setSearchUsers(searchUsers)
+            })()
         } else {
             if (currentUser) {
                 const followings = users.filter((user) =>
-                    currentUser.followings.includes(user._id),
-                );
-                setSearchUsers(followings);
+                    currentUser.followings.includes(user._id)
+                )
+                setSearchUsers(followings)
             }
         }
-    }, [deferredQuery, currentUser, users]);
+    }, [deferredQuery, currentUser, users])
 
     useEffect(() => {
-        const selectedUsers = caption?.match(/@\w*\b/g);
+        const selectedUsers = input?.match(/@\w*\b/g)
+
         if (selectedUsers === null) {
-            setSelectedUsers([]);
+            setSelectedUsers([])
         } else {
-            setSelectedUsers(selectedUsers);
+            setSelectedUsers(selectedUsers)
         }
-    }, [caption]);
+    }, [input])
 
     const handleSelectUser = (username) => {
-        setSelectFormShow(false);
-        setSeachValue('');
-        if (caption[caption.length - 1] === '@') {
-            const newCaption = caption.slice(0, -1);
-            setCaption(newCaption.concat(`@${username} `));
+        setSelectFormShow(false)
+        setSeachValue('')
+        searchInputRef.current.focus()
+
+        if (input[input.length - 1] === '@') {
+            const newInput = input.slice(0, -1)
+            setInput(newInput.concat(`@${username} `))
         } else {
-            setCaption(caption.concat(`@${username} `));
+            setInput(input.concat(`@${username} `))
         }
-    };
+    }
 
     return (
-        <Wrapper className="form-group">
-            <div className="title">
-                <label htmlFor="search-user" className="label">
-                    <AtIcon width="1.4rem" height="1.4rem" />
-                    Friends
-                </label>
-            </div>
-            <div className="input-container">
-                <span className="search-icon icon-wrapper">
-                    <SearchIcon width="1.8rem" height="1.8rem" />
-                </span>
-                <span
-                    className="close-icon icon-wrapper"
-                    onClick={() => setSelectFormShow(false)}
-                >
-                    <TimesIcon width="2.4rem" height="2.4rem" />
-                </span>
-                <input
-                    type="text"
-                    maxLength={150}
-                    className="input search-input"
-                    id="search-user"
-                    value={searchValue}
-                    onChange={(e) => setSeachValue(e.target.value)}
-                    ref={searchInputRef}
-                />
-                <div className="user-search-container">
+        <Wrapper className="input-container">
+            <span className="search-icon icon-wrapper">
+                <SearchIcon width="1.8rem" height="1.8rem" />
+            </span>
+            <span
+                className="close-icon icon-wrapper"
+                onClick={() => setSelectFormShow(false)}
+            >
+                <TimesIcon width="2.4rem" height="2.4rem" />
+            </span>
+
+            <input
+                type="text"
+                maxLength={150}
+                className="input search-input"
+                id="search-user"
+                value={searchValue}
+                onChange={(e) => setSeachValue(e.target.value)}
+                ref={searchInputRef}
+            />
+
+            <div className="user-search-container">
+                <div className="user-search">
                     <div className="select-column">
                         <div className="select-title">
                             {searchValue ? 'All users' : 'Following'}
                         </div>
+
                         <ul className="select-list">
                             {recommendUsers.map((user) => (
                                 <li
@@ -133,6 +131,7 @@ export default function SearchUser({
                             ))}
                         </ul>
                     </div>
+
                     <div className="select-column">
                         <div className="select-title">Recent</div>
                         <ul className="select-list">
@@ -148,5 +147,5 @@ export default function SearchUser({
                 </div>
             </div>
         </Wrapper>
-    );
+    )
 }
