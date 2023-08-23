@@ -127,15 +127,7 @@ export default function VideoContainer({ video }) {
             videoIndex - 1 < 0 ? fypVideos.length - 1 : videoIndex - 1
 
         const previousVideo = fypVideos[previousIndex]
-        const background = location.state.background
-        navigate(
-            `/@${previousVideo.user.username}/video/${previousVideo._id}`,
-            {
-                state: {
-                    background,
-                },
-            }
-        )
+        navigate(`/@${previousVideo.user.username}/video/${previousVideo._id}`)
     }
 
     const handleNext = () => {
@@ -143,12 +135,7 @@ export default function VideoContainer({ video }) {
             videoIndex + 1 > fypVideos.length - 1 ? 0 : videoIndex + 1
 
         const nextVideo = fypVideos[nextIndex]
-        const background = location.state.background
-        navigate(`/@${nextVideo.user.username}/video/${nextVideo._id}`, {
-            state: {
-                background,
-            },
-        })
+        navigate(`/@${nextVideo.user.username}/video/${nextVideo._id}`, {})
     }
 
     const fypVideos = videos.filter(
