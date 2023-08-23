@@ -27,7 +27,7 @@ const LOGIN = {
         {
             icon: <QRCodeIcon width="2rem" height="2rem" />,
             title: 'Use QR code',
-            to: '/login/qrcode',
+            // to: '/login/qrcode',
             children: {
                 title: 'Log in with QR code',
                 data: [],
@@ -37,7 +37,7 @@ const LOGIN = {
         {
             icon: <UserIcon width="2rem" height="2rem" />,
             title: 'Use phone / email / username',
-            to: '/login/phone-or-email',
+            // to: '/login/phone-or-email',
             children: {
                 title: 'Log in',
                 data: [],
@@ -81,7 +81,7 @@ const SIGNUP = {
         {
             icon: <UserIcon width="2rem" height="2rem" />,
             title: 'Use phone or email',
-            to: '/signup/phone-or-email/email',
+            // to: '/signup/phone-or-email/email',
             children: {
                 title: 'Sign up',
                 component: PhoneEmailSignup,

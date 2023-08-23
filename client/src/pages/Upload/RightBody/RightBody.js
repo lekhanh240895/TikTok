@@ -163,6 +163,7 @@ export default function RightBody({
                 src: videoUrl,
                 cover: imgUrl,
             }
+            
             const response = await videoService.create(newFormData)
             const user = users.find((user) => user._id === response.user)
             const newVideo = {
