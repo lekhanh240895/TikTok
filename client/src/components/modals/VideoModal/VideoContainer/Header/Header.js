@@ -6,7 +6,7 @@ export default function Header() {
     const navigate = useNavigate()
 
     const handleClose = () => {
-        navigate(-1)
+        navigate('/')
     }
     return (
         <Wrapper className="header">

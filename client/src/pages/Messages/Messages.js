@@ -41,12 +41,6 @@ export default function Messages() {
         })()
     }, [currentUser])
 
-    useEffect(() => {
-        return () => {
-            dispatch(appSlice.actions.setSelectedConversationID(null))
-        }
-    }, [dispatch])
-
     const selectedConversation = conversations.find(
         (conversation) => conversation._id === selectedConversationID
     )

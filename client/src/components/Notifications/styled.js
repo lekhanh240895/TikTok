@@ -85,7 +85,7 @@ export const Wrapper = styled.div`
                     color: rgb(22 24 35 / 50%);
                     max-height: 70px;
 
-                    & + span {
+                    span {
                         overflow: hidden;
                         display: -webkit-box;
                         -webkit-box-orient: vertical;

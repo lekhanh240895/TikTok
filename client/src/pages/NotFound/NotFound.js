@@ -1,8 +1,8 @@
-import { Link } from 'react-router-dom';
-import images from '~/assets/images';
-import Button from '~/components/Button';
-import { PlayIcon } from '~/components/Icons';
-import { Wrapper } from './styled';
+import { Link } from 'react-router-dom'
+import images from '~/assets/images'
+import Button from '~/components/Button'
+import { PlayIcon } from '~/components/Icons'
+import { Wrapper } from './styled'
 
 export default function NotFound() {
     return (
@@ -33,5 +33,5 @@ export default function NotFound() {
                 </Link>
             </div>
         </Wrapper>
-    );
+    )
 }

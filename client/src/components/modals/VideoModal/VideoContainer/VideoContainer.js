@@ -122,26 +122,54 @@ export default function VideoContainer({ video }) {
         setConfig(newSettings)
     }
 
-    const handlePrevious = () => {
+    const fypVideos = videos.filter(
+        (video) => video.user._id !== currentUser?._id
+    )
+    const videoIndex = fypVideos.findIndex((v) => v._id === video?._id)
+
+    const handlePrevious = useCallback(() => {
         const previousIndex =
             videoIndex - 1 < 0 ? fypVideos.length - 1 : videoIndex - 1
 
         const previousVideo = fypVideos[previousIndex]
         navigate(`/@${previousVideo.user.username}/video/${previousVideo._id}`)
-    }
+    }, [fypVideos, navigate, videoIndex])
 
-    const handleNext = () => {
+    const handleNext = useCallback(() => {
         const nextIndex =
             videoIndex + 1 > fypVideos.length - 1 ? 0 : videoIndex + 1
 
         const nextVideo = fypVideos[nextIndex]
-        navigate(`/@${nextVideo.user.username}/video/${nextVideo._id}`, {})
-    }
+        navigate(`/@${nextVideo.user.username}/video/${nextVideo._id}`)
+    }, [fypVideos, navigate, videoIndex])
 
-    const fypVideos = videos.filter(
-        (video) => video.user._id !== currentUser?._id
-    )
-    const videoIndex = fypVideos.findIndex((v) => v._id === video?._id)
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.code === 'ArrowUp') {
+                handlePrevious()
+            }
+            if (event.code === 'ArrowDown') {
+                handleNext()
+            }
+        }
+
+        const handleWheel = (event) => {
+            const delta = Math.sign(event.deltaY)
+            if (delta > 0) {
+                handleNext()
+            } else {
+                handlePrevious()
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        window.addEventListener('wheel', handleWheel)
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+            window.removeEventListener('wheel', handleWheel)
+        }
+    }, [handleNext, handlePrevious])
 
     return (
         <Wrapper className="video-container">
