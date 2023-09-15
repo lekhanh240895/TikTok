@@ -3,7 +3,7 @@ import classnames from 'classnames/bind'
 import Tippy from '@tippyjs/react'
 import HeadlessTippy from '@tippyjs/react/headless'
 import 'tippy.js/dist/tippy.css' // optional
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Wrapper as PopperWrapper } from '~/components/Popper'
 import styles from './Header.module.scss'
 import images from '~/assets/images'
@@ -20,12 +20,13 @@ import {
     MessageIcon,
     OptionIcon,
     ProfileIcon,
+    SearchIcon,
     SettingIcon,
     SolidMessageIcon,
+    TiktokIcon,
     UploadIcon,
 } from '~/components/Icons'
 import Image from '~/components/Image'
-import Search from '../Search'
 import config from '~/config'
 import { useDispatch, useSelector } from 'react-redux'
 import loginModalSlice from '~/redux/slices/loginModalSlice'
@@ -37,12 +38,14 @@ import * as notificationService from '~/services/notificationService'
 import { isEqual } from 'lodash'
 import messageSlice from '~/redux/slices/messageSlice'
 import { setLocalData } from '~/utils/setLocalData'
+import SearchBar from '../SearchBar'
 
 const cx = classnames.bind(styles)
 
 export default function Header({ innerWidth }) {
     const { currentUser } = useSelector(authSelector)
     const { messages } = useSelector(messagesSelector)
+    const navigate = useNavigate()
 
     const MENU_ITEMS = [
         {
@@ -163,6 +166,7 @@ export default function Header({ innerWidth }) {
     const orderedNotifications = notifications.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     )
+
     return (
         <header className={cx('wrapper')}>
             <div className={cx('inner')} style={{ width: innerWidth }}>
@@ -170,9 +174,20 @@ export default function Header({ innerWidth }) {
                     <Image src={images.logo} alt="Tiktok Logo" />
                 </Link>
 
-                <Search />
+                <Link to={config.routes.home} className={cx('mobile-logo')}>
+                    <TiktokIcon />
+                </Link>
+
+                <SearchBar />
 
                 <div className={cx('actions')}>
+                    <span
+                        className={cx('search-btn')}
+                        onClick={() => navigate('/search')}
+                    >
+                        <SearchIcon width="2.6rem" height="2.6rem" />
+                    </span>
+
                     <Button
                         secondary
                         className={cx('upload-btn')}

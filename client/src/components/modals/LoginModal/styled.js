@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 export const Wrapper = styled.div`
     position: fixed;
@@ -58,6 +58,7 @@ export const Wrapper = styled.div`
             }
 
             .modal_body {
+                padding: 16px;
                 padding-top: 58px;
                 flex: 1 1 0%;
                 overflow: auto;
@@ -94,4 +95,4 @@ export const Wrapper = styled.div`
             }
         }
     }
-`;
+`

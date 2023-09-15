@@ -4,6 +4,10 @@
 }
 
 .search {
+    --search-border-radius: 92px;
+    --search-height: 46px;
+    --search-button-width: 52px;
+
     padding-left: 16px;
     border-radius: var(--search-border-radius);
     background-color: var(--main-background-color);

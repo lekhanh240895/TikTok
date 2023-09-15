@@ -173,7 +173,7 @@ export default function VideoContainer({ video }) {
 
     return (
         <Wrapper className="video-container">
-            <Header />
+            <Header handlePlay={handlePlay} />
 
             <div className="body">
                 <div

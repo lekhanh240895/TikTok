@@ -16,7 +16,8 @@ export const Wrapper = styled.div`
             display: flex;
             align-self: center;
 
-            .close-btn {
+            .close-btn,
+            .search-btn {
                 margin-right: 24px;
                 color: #fff;
                 cursor: pointer;
@@ -24,6 +25,12 @@ export const Wrapper = styled.div`
                 height: 40px;
                 border-radius: 50%;
                 background-color: rgb(255 255 255 / 12%);
+            }
+
+            @media (min-width: 768px) {
+                .search-btn {
+                    display: none;
+                }
             }
         }
         .right {

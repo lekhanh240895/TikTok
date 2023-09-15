@@ -1,30 +1,30 @@
-import HeadlessTippy from '@tippyjs/react/headless';
-import classnames from 'classnames/bind';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import styles from './Search.module.scss';
-import { Wrapper as PopperWrapper } from '~/components/Popper';
-import AccountItem from '../AccountItem';
-import { TimesIconCircle, SearchIcon, SpinnerIcon } from '~/components/Icons';
-import { useDebounce } from '~/hooks/useDebounce';
-import * as userService from '~/services/userService';
-import Button from '~/components/Button';
-import { useSelector } from 'react-redux';
-import { appSelector } from '~/redux/selectors';
+import HeadlessTippy from '@tippyjs/react/headless'
+import classnames from 'classnames/bind'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import styles from './Search.module.scss'
+import { Wrapper as PopperWrapper } from '~/components/Popper'
+import AccountItem from '../AccountItem'
+import { TimesIconCircle, SearchIcon, SpinnerIcon } from '~/components/Icons'
+import { useDebounce } from '~/hooks/useDebounce'
+import * as userService from '~/services/userService'
+import Button from '~/components/Button'
+import { useSelector } from 'react-redux'
+import { appSelector } from '~/redux/selectors'
 
-const cx = classnames.bind(styles);
+const cx = classnames.bind(styles)
 
-export default function Search() {
-    const [searchResult, setSearchResult] = useState([]);
-    const [searchKeywords, setSearchKeywords] = useState([]);
-    const [searchValue, setSearchValue] = useState('');
-    const [showResult, setShowResult] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const inputRef = useRef();
-    const { tags, musics } = useSelector(appSelector);
+export default function SearchBar() {
+    const [searchResult, setSearchResult] = useState([])
+    const [searchKeywords, setSearchKeywords] = useState([])
+    const [searchValue, setSearchValue] = useState('')
+    const [showResult, setShowResult] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const inputRef = useRef()
+    const { tags, musics } = useSelector(appSelector)
 
-    const navigate = useNavigate();
-    const debouncedValue = useDebounce(searchValue, 500);
+    const navigate = useNavigate()
+    const debouncedValue = useDebounce(searchValue, 500)
 
     const renderSearchKeywords = () => {
         if (searchKeywords.length > 0) {
@@ -46,71 +46,71 @@ export default function Search() {
                         {item}
                     </Button>
                 </Link>
-            ));
+            ))
         }
-    };
+    }
 
     const handleSearch = useCallback(() => {
         if (!debouncedValue.trim()) {
-            setSearchResult([]);
-            setSearchKeywords([]);
-            return;
+            setSearchResult([])
+            setSearchKeywords([])
+            return
         }
 
         const fetchAPI = async () => {
-            setLoading(true);
+            setLoading(true)
 
-            const searchUsers = await userService.searchUser(debouncedValue);
+            const searchUsers = await userService.searchUser(debouncedValue)
 
             const searchKeywords = [
                 ...tags.map((tag) => tag),
                 ...musics.map((music) => music),
                 ...searchUsers.map((user) => user.full_name),
-            ];
+            ]
 
             const filteredSearchKeywords = searchKeywords.filter((keyword) =>
-                keyword.toLowerCase().includes(debouncedValue.toLowerCase()),
-            );
+                keyword.toLowerCase().includes(debouncedValue.toLowerCase())
+            )
 
-            setLoading(false);
-            setSearchKeywords(filteredSearchKeywords.slice(0, 8));
-            setSearchResult(searchUsers.slice(0, 5));
-        };
+            setLoading(false)
+            setSearchKeywords(filteredSearchKeywords.slice(0, 8))
+            setSearchResult(searchUsers.slice(0, 5))
+        }
 
-        fetchAPI();
-    }, [debouncedValue, tags, musics]);
+        fetchAPI()
+    }, [debouncedValue, tags, musics])
 
     useEffect(() => {
-        handleSearch();
-    }, [handleSearch]);
+        handleSearch()
+    }, [handleSearch])
 
     const handleClear = () => {
-        setSearchValue('');
-        setSearchKeywords([]);
-        setSearchResult([]);
-        inputRef.current.focus();
-    };
+        setSearchValue('')
+        setSearchKeywords([])
+        setSearchResult([])
+        inputRef.current.focus()
+    }
 
     const handleHideResult = () => {
-        setShowResult(false);
-    };
+        setShowResult(false)
+    }
 
     const handleChange = (e) => {
-        const searchValue = e.target.value;
+        const searchValue = e.target.value
 
         if (!searchValue.startsWith(' ')) {
-            setSearchValue(searchValue);
+            setSearchValue(searchValue)
         }
-    };
+    }
 
     // Form Submit
     const handleSubmit = (e) => {
-        e.preventDefault();
-        setShowResult(false);
+        e.preventDefault()
+        setShowResult(false)
         navigate(`/search?q=${searchValue}`, {
             replace: true,
-        });
-    };
+        })
+    }
 
     return (
         // Tippy.js
@@ -154,8 +154,8 @@ export default function Search() {
                                     onClick={() => {
                                         navigate(`/search?q=${searchValue}`, {
                                             replace: true,
-                                        });
-                                        handleHideResult();
+                                        })
+                                        handleHideResult()
                                     }}
                                 >
                                     View all results for {debouncedValue}
@@ -166,7 +166,6 @@ export default function Search() {
                 )}
             >
                 <form className={cx('search')} onSubmit={handleSubmit}>
-                    {/* <form className={cx('search')} method="GET" action="/search"> */}
                     <input
                         placeholder="Search accounts and videos"
                         spellCheck={false}
@@ -208,5 +207,5 @@ export default function Search() {
                 </form>
             </HeadlessTippy>
         </div>
-    );
+    )
 }

@@ -99,7 +99,6 @@ export const Wrapper = styled.div`
                 }
                 .notification-desc__comment {
                     color: rgb(22 24 35 / 50%);
-                    display: block;
                     margin-top: 4px;
                     padding-left: 8px;
                     border-left: 1px solid rgb(22 24 35 / 50%);
@@ -109,6 +108,7 @@ export const Wrapper = styled.div`
                     -webkit-line-clamp: 2;
                     text-overflow: ellipsis;
                     word-break: break-word;
+                    display: block;
                 }
                 .notification-desc__mention {
                     display: inline-block;

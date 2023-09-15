@@ -10,5 +10,6 @@ export const routes = {
     music: '/music/:musicname',
     messages: '/messages',
     video: '@:username/video/:videoID',
+    mobileSearch: '/search/mobile',
     notFound: '*',
 }

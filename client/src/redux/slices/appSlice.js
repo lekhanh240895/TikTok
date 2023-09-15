@@ -19,6 +19,7 @@ const appSlice = createSlice({
         socket: null,
         onlineUsers: [],
         conversations: [],
+        isSearchModalShow: false,
     },
     reducers: {
         setConversations: (state, action) => {
@@ -54,6 +55,9 @@ const appSlice = createSlice({
         },
         setSettings: (state, action) => {
             state.settings = action.payload
+        },
+        setIsSearchModalShow: (state, action) => {
+            state.isSearchModalShow = action.payload
         },
     },
 })
